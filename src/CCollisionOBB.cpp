@@ -22,7 +22,6 @@ cCollisionOBB::~cCollisionOBB()
 
 void cCollisionOBB::initialize(const double a_radius)
 {
-    // Interface tuong thich voi cGenericCollision[cite: 3]
     if (!m_triangles.empty())
     {
         initialize(m_triangles);
@@ -31,7 +30,6 @@ void cCollisionOBB::initialize(const double a_radius)
 
 void cCollisionOBB::initialize(const std::vector<cTriangle*>& a_triangles)
 {
-    // Giai phong cay cu neu co
     if (m_root != nullptr)
     {
         delete m_root;
@@ -41,7 +39,6 @@ void cCollisionOBB::initialize(const std::vector<cTriangle*>& a_triangles)
     m_triangles = a_triangles;
     if (m_triangles.empty()) return;
 
-    // Bat dau dung cay de quy tu goc (Root)[cite: 1, 4]
     std::vector<cTriangle*> triList = m_triangles;
     m_root = buildTree(triList, 0);
 }
@@ -50,7 +47,7 @@ cCollisionOBBNode* cCollisionOBB::buildTree(std::vector<cTriangle*>& a_triangles
 {
     if (a_triangles.empty()) return nullptr;
 
-    // 1. Thu thap toan bo cac dinh cua cac tam giac thuoc node hien tai[cite: 3]
+    // 1. Thu thap toan bo dinh tu cac tam giac
     std::vector<cVector3d> points;
     points.reserve(a_triangles.size() * 3);
     for (const auto& tri : a_triangles)
@@ -60,11 +57,11 @@ cCollisionOBBNode* cCollisionOBB::buildTree(std::vector<cTriangle*>& a_triangles
         points.push_back(tri->m_v2);
     }
 
-    // 2. Tinh toan OBB toi uu bang PCA tu tap dinh[cite: 3]
+    // 2. Tinh toan OBB toi uu bang PCA
     cCollisionOBBBox nodeBox;
     buildOBBFromPoints(points, nodeBox);
 
-    // 3. BASE CASE: Neu so luong tam giac <= 1 thi tao Node La (Leaf)[cite: 1, 4]
+    // 3. BASE CASE: Node la (<= 1 tam giac)
     if (a_triangles.size() <= 1)
     {
         cCollisionOBBLeaf* leaf = new cCollisionOBBLeaf(a_triangles[0]);
@@ -72,7 +69,7 @@ cCollisionOBBNode* cCollisionOBB::buildTree(std::vector<cTriangle*>& a_triangles
         return leaf;
     }
 
-    // 4. SPLITTING STRATEGY: Tim truc dai nhat cua OBB[cite: 4]
+    // 4. Tim truc dai nhat cua OBB
     int longestAxis = 0;
     double maxExtent = nodeBox.m_extent.x();
     if (nodeBox.m_extent.y() > maxExtent)
@@ -88,7 +85,7 @@ cCollisionOBBNode* cCollisionOBB::buildTree(std::vector<cTriangle*>& a_triangles
     cVector3d splitAxis = nodeBox.u[longestAxis];
     cVector3d splitOrigin = nodeBox.m_center;
 
-    // 5. Phan loai tam giac vao 2 tap con (Trai va Phai) dua vao mat phang chia[cite: 4]
+    // 5. Phan loai tam giac vao nhanh trai va phai
     std::vector<cTriangle*> leftList;
     std::vector<cTriangle*> rightList;
 
@@ -97,21 +94,15 @@ cCollisionOBBNode* cCollisionOBB::buildTree(std::vector<cTriangle*>& a_triangles
         cVector3d centroid = tri->computeCentroid();
         cVector3d diff = centroid - splitOrigin;
 
-        // Tinh hinh chieu len truc dai nhat
         double proj = diff.x() * splitAxis.x() + diff.y() * splitAxis.y() + diff.z() * splitAxis.z();
 
         if (proj >= 0.0)
-        {
             leftList.push_back(tri);
-        }
         else
-        {
             rightList.push_back(tri);
-        }
     }
 
-    // 6. XU LY SUY BIEN (Degenerate Case): Neu toan bo tam giac bi don sang 1 ben
-    // Ap dung Median Split: Chia doi mang de dam bao cay khong bi de quy vo han
+    // 6. Xu ly suy bien bang Median Split
     if (leftList.empty() || rightList.empty())
     {
         leftList.clear();
@@ -124,7 +115,7 @@ cCollisionOBBNode* cCollisionOBB::buildTree(std::vector<cTriangle*>& a_triangles
         }
     }
 
-    // 7. Khoi tao Node Trung Gian va de quy dung 2 nhanh cay con[cite: 1, 3, 4]
+    // 7. Khoi tao node trung gian va de quy dung 2 cay con
     cCollisionOBBInternal* internalNode = new cCollisionOBBInternal();
     internalNode->m_bbox = nodeBox;
     internalNode->m_leftSubTree = buildTree(leftList, a_depth + 1);
@@ -166,13 +157,23 @@ bool cCollisionOBB::computeCollision(cGenericObject* a_object,
                                       cCollisionRecorder& a_recorder,
                                       cCollisionSettings& a_settings)
 {
-    // Se cai dat o Giai doan 4[cite: 1, 4]
-    return false;
+    if (m_root == nullptr) return false;
+
+    bool hit = m_root->computeCollision(a_object, a_segmentPointA, a_segmentPointB, a_recorder, a_settings);
+
+    if (hit && !a_recorder.m_collisions.empty())
+    {
+        std::sort(a_recorder.m_collisions.begin(), a_recorder.m_collisions.end(),
+            [](const cCollisionEvent& a, const cCollisionEvent& b) {
+                return a.m_squareDistance < b.m_squareDistance;
+            });
+    }
+
+    return hit;
 }
 
 void cCollisionOBB::render(cRenderOptions& a_options)
 {
-    // Se cai dat o Giai doan 5[cite: 1, 4]
 }
 
 } // namespace chai3d

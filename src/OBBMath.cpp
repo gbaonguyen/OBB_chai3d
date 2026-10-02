@@ -4,7 +4,6 @@
 
 namespace chai3d {
 
-// 1. Tinh toa do trong tam cua tap diem
 cVector3d computeCentroid(const std::vector<cVector3d>& a_points)
 {
     cVector3d centroid(0.0, 0.0, 0.0);
@@ -19,7 +18,6 @@ cVector3d computeCentroid(const std::vector<cVector3d>& a_points)
     return centroid * invN;
 }
 
-// 2. Xay dung ma tran hiep phuong sai 3x3[cite: 3]
 void computeCovarianceMatrix(const std::vector<cVector3d>& a_points, 
                              const cVector3d& a_centroid, 
                              double a_cov[3][3])
@@ -58,7 +56,6 @@ void computeCovarianceMatrix(const std::vector<cVector3d>& a_points,
     }
 }
 
-// 3. Jacobi Rotation cho ma tran doi xung thuc 3x3[cite: 3]
 void computeEigenSystem(double a_cov[3][3], 
                         double a_eigenvalues[3], 
                         cVector3d a_eigenvectors[3])
@@ -66,7 +63,6 @@ void computeEigenSystem(double a_cov[3][3],
     double A[3][3];
     double V[3][3];
 
-    // Khoi tao ma tran A tu covariance matrix va V la ma tran don vi I
     for (int i = 0; i < 3; ++i)
     {
         for (int j = 0; j < 3; ++j)
@@ -81,7 +77,6 @@ void computeEigenSystem(double a_cov[3][3],
 
     for (int iter = 0; iter < maxIterations; ++iter)
     {
-        // Tim phan tu ngoai duong cheo co gia tri tuyet doi lon nhat
         int p = 0, q = 1;
         double maxVal = std::fabs(A[0][1]);
         if (std::fabs(A[0][2]) > maxVal) { maxVal = std::fabs(A[0][2]); p = 0; q = 2; }
@@ -93,7 +88,6 @@ void computeEigenSystem(double a_cov[3][3],
         double aqq = A[q][q];
         double apq = A[p][q];
 
-        // Tinh goc quay theta
         double phi = 0.5 * (aqq - app) / apq;
         double t = (phi >= 0.0) ? (1.0 / (phi + std::sqrt(phi * phi + 1.0)))
                                 : (-1.0 / (-phi + std::sqrt(phi * phi + 1.0)));
@@ -101,13 +95,11 @@ void computeEigenSystem(double a_cov[3][3],
         double s = t * c;
         double tau = s / (1.0 + c);
 
-        // Cap nhat duong cheo chinh cua ma tran A
         A[p][p] = app - t * apq;
         A[q][q] = aqq + t * apq;
         A[p][q] = 0.0;
         A[q][p] = 0.0;
 
-        // Cap nhat cac phan tu con lai
         for (int r = 0; r < 3; ++r)
         {
             if (r != p && r != q)
@@ -119,7 +111,6 @@ void computeEigenSystem(double a_cov[3][3],
             }
         }
 
-        // Tich luy cac phep quay vao ma tran V de lay eigenvector
         for (int r = 0; r < 3; ++r)
         {
             double vrp = V[r][p];
@@ -129,7 +120,6 @@ void computeEigenSystem(double a_cov[3][3],
         }
     }
 
-    // Trich xuat tri rieng va vector rieng
     for (int i = 0; i < 3; ++i)
     {
         a_eigenvalues[i] = A[i][i];
@@ -137,7 +127,6 @@ void computeEigenSystem(double a_cov[3][3],
         a_eigenvectors[i].normalize();
     }
 
-    // Sap xep tri rieng va vector rieng giam dan
     for (int i = 0; i < 2; ++i)
     {
         for (int j = i + 1; j < 3; ++j)
@@ -150,7 +139,6 @@ void computeEigenSystem(double a_cov[3][3],
         }
     }
 
-    // Tinh cross product truc tiep de kiem tra he truc toa do ban tay phai
     cVector3d crossCheck(
         a_eigenvectors[0].y() * a_eigenvectors[1].z() - a_eigenvectors[0].z() * a_eigenvectors[1].y(),
         a_eigenvectors[0].z() * a_eigenvectors[1].x() - a_eigenvectors[0].x() * a_eigenvectors[1].z(),
@@ -167,7 +155,6 @@ void computeEigenSystem(double a_cov[3][3],
     }
 }
 
-// 4. Chieu tap diem len truc dinh huong de tim min va max[cite: 3]
 void computeExtremePointsAlongDirection(const std::vector<cVector3d>& a_points,
                                         const cVector3d& a_direction,
                                         double& a_min,
@@ -195,27 +182,21 @@ void computeExtremePointsAlongDirection(const std::vector<cVector3d>& a_points,
     }
 }
 
-// 5. Tinh toan OBB hoan chinh bao quanh tap diem[cite: 3]
 void buildOBBFromPoints(const std::vector<cVector3d>& a_points, cCollisionOBBBox& a_box)
 {
     if (a_points.empty()) return;
 
-    // 1. Tinh trong tam
     cVector3d centroid = computeCentroid(a_points);
 
-    // 2. Tinh ma tran hiep phuong sai[cite: 3]
     double cov[3][3];
     computeCovarianceMatrix(a_points, centroid, cov);
 
-    // 3. Tim he truc dinh huong bang Jacobi Rotation[cite: 3]
     double eigenvalues[3];
     computeEigenSystem(cov, eigenvalues, a_box.u);
 
-    // 4. Khai bao day du bien tam va extents truoc vong lap
     cVector3d center(0.0, 0.0, 0.0);
     double extentArr[3] = {0.0, 0.0, 0.0};
 
-    // 5. Chieu tap diem len 3 truc de tim extents va center[cite: 3]
     for (int i = 0; i < 3; ++i)
     {
         double minVal = 0.0;
@@ -225,7 +206,6 @@ void buildOBBFromPoints(const std::vector<cVector3d>& a_points, cCollisionOBBBox
         extentArr[i] = 0.5 * (maxVal - minVal);
         double midVal = 0.5 * (maxVal + minVal);
 
-        // Nhan theo thu tu hop le trong Chai3D: (cVector3d * double)
         center = center + (a_box.u[i] * midVal);
     }
 
