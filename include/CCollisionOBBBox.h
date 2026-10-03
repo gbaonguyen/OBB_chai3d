@@ -72,6 +72,9 @@ public:
 
         return (tMin <= tMax && tMax >= 0.0 && tMin <= 1.0);
     }
+
+    // Chi khai bao prototype, khong can include OpenGL header o day
+    void render() const;
 };
 
 } // namespace chai3d

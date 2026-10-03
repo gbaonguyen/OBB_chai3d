@@ -33,7 +33,6 @@ public:
         return (m_v0 + m_v1 + m_v2) * (1.0 / 3.0);
     }
 
-    // Fine Test: Giao cat Doan thang - Tam giac (Moller-Trumbore)
     bool computeCollision(const cVector3d& a_pA,
                           const cVector3d& a_pB,
                           cVector3d& a_hitPoint,
@@ -108,13 +107,9 @@ public:
                                    cCollisionRecorder& a_recorder,
                                    cCollisionSettings& a_settings) override
     {
-        // 1. Coarse test: Doan thang vs OBB cua node la
         if (!m_bbox.intersectSegment(a_segmentPointA, a_segmentPointB))
-        {
             return false;
-        }
 
-        // 2. Fine test: Kiem tra chi tiet voi tam giac
         if (m_triangle == nullptr) return false;
 
         cVector3d hitPoint, hitNormal;
@@ -137,7 +132,18 @@ public:
         return false;
     }
 
-    virtual void render(cRenderOptions& a_options) override {}
+    virtual void render(cRenderOptions& a_options) override
+    {
+        render(a_options, 0, -1);
+    }
+
+    virtual void render(cRenderOptions& a_options, int a_currentDepth, int a_targetDepth) override
+    {
+        if (a_targetDepth == -1 || a_currentDepth == a_targetDepth)
+        {
+            m_bbox.render();
+        }
+    }
 };
 
 } // namespace chai3d

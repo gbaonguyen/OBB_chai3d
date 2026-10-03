@@ -29,6 +29,7 @@ public:
                                    cCollisionSettings& a_settings) = 0;
 
     virtual void render(cRenderOptions& a_options) = 0;
+    virtual void render(cRenderOptions& a_options, int a_currentDepth, int a_targetDepth) = 0;
 };
 
 } // namespace chai3d

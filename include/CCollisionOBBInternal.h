@@ -38,11 +38,9 @@ public:
                                    cCollisionRecorder& a_recorder,
                                    cCollisionSettings& a_settings) override
     {
-        // 1. Coarse test: Doan thang vs OBB cua node trung gian
         if (!m_bbox.intersectSegment(a_segmentPointA, a_segmentPointB))
             return false;
 
-        // 2. DFS: De quy sang 2 nhanh con
         bool hitLeft = false;
         bool hitRight = false;
 
@@ -59,7 +57,29 @@ public:
         return (hitLeft || hitRight);
     }
 
-    virtual void render(cRenderOptions& a_options) override {}
+    virtual void render(cRenderOptions& a_options) override
+    {
+        render(a_options, 0, -1);
+    }
+
+    virtual void render(cRenderOptions& a_options, int a_currentDepth, int a_targetDepth) override
+    {
+        // Neu muc tieu la -1 (ve tat ca) hoac dung tang do sau can render
+        if (a_targetDepth == -1 || a_currentDepth == a_targetDepth)
+        {
+            m_bbox.render();
+        }
+
+        // Neu chua dat den do sau toi da thi tiep tuc de quy xuong cac cay con
+        if (a_targetDepth == -1 || a_currentDepth < a_targetDepth)
+        {
+            if (m_leftSubTree != nullptr)
+                m_leftSubTree->render(a_options, a_currentDepth + 1, a_targetDepth);
+
+            if (m_rightSubTree != nullptr)
+                m_rightSubTree->render(a_options, a_currentDepth + 1, a_targetDepth);
+        }
+    }
 };
 
 } // namespace chai3d

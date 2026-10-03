@@ -16,6 +16,10 @@ public:
     std::vector<cTriangle*> m_triangles;
     bool m_useNeighbors;
 
+    // Cac bien dieu khien truc quan hoa Giai doan 5
+    bool m_showBoundingBoxes;
+    int m_displayDepth; // -1: tat ca tang; >= 0: chi hien thi tang cu the
+
     cCollisionOBB();
     virtual ~cCollisionOBB();
 
@@ -29,6 +33,9 @@ public:
                                    cCollisionSettings& a_settings) override;
 
     virtual void render(cRenderOptions& a_options) override;
+
+    void setDisplayDepth(int a_depth) { m_displayDepth = a_depth; }
+    int getDisplayDepth() const { return m_displayDepth; }
 
     int getLeafCount(cCollisionOBBNode* a_node) const;
     int getTreeDepth(cCollisionOBBNode* a_node) const;
