@@ -14,6 +14,9 @@ public:
     cVector3d m_v2;
     int m_index;
 
+    // Danh sach tam giac lang gieng chia se canh (Neighbor Triangles)
+    std::vector<cTriangle*> m_neighbors;
+
     cTriangle() : m_index(-1)
     {
         m_v0.zero();

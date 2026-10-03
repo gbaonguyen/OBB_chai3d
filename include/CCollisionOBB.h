@@ -16,15 +16,21 @@ public:
     std::vector<cTriangle*> m_triangles;
     bool m_useNeighbors;
 
-    // Cac bien dieu khien truc quan hoa Giai doan 5
+    // Con trỏ lưu tam giác va chạm ở frame trước cho Local Search
+    cTriangle* m_lastCollidedTriangle;
+
+    // Biến điều khiển hiển thị trực quan hóa
     bool m_showBoundingBoxes;
-    int m_displayDepth; // -1: tat ca tang; >= 0: chi hien thi tang cu the
+    int m_displayDepth;
 
     cCollisionOBB();
     virtual ~cCollisionOBB();
 
     void initialize(const std::vector<cTriangle*>& a_triangles);
     virtual void initialize(const double a_radius = 0.0);
+
+    // Xây dựng đồ thị láng giềng giữa các tam giác chia sẻ cạnh
+    void buildNeighbors();
 
     virtual bool computeCollision(cGenericObject* a_object,
                                    cVector3d& a_segmentPointA,

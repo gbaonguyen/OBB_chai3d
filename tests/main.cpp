@@ -12,6 +12,7 @@
 void runMathTests();
 void runTraversalTests();
 void runTreeTests();
+void runBenchmark(); // <-- Them khai bao nay
 
 using namespace chai3d;
 
@@ -250,6 +251,9 @@ int main()
     runTraversalTests();
 
     std::cout << "=== TOAN BO UNIT TESTS DA VUOT QUA THANH CONG! ===\n";
+
+    // Chay Benchmark Giai doan 6 (Hang muc 2)
+    runBenchmark();
 
     // Khoi chay truc quan hoa Giai doan 5
     runVisualizationDemo();

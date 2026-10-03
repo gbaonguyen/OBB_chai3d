@@ -43,6 +43,7 @@ add_executable(obb_tests
     tests/main.cpp
     tests/test_math.cpp
     tests/test_traversal.cpp
+    tests/test_bench_mark.cpp
 )
 
 target_link_directories(obb_tests PRIVATE
