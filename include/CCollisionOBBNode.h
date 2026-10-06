@@ -9,24 +9,21 @@ namespace chai3d {
 const int C_COLLISION_OBB_NODE_INTERNAL = 0;
 const int C_COLLISION_OBB_NODE_LEAF     = 1;
 
+// Common interface and bounding volume shared by internal and leaf nodes.
 class cCollisionOBBNode
 {
 public:
     cCollisionOBBBox m_bbox;
     int m_nodeType;
 
-    cCollisionOBBNode()
-    {
-        m_nodeType = C_COLLISION_OBB_NODE_INTERNAL;
-    }
-
-    virtual ~cCollisionOBBNode() {}
+    cCollisionOBBNode();
+    virtual ~cCollisionOBBNode();
 
     virtual bool computeCollision(cGenericObject* a_object,
-                                   cVector3d& a_segmentPointA,
-                                   cVector3d& a_segmentPointB,
-                                   cCollisionRecorder& a_recorder,
-                                   cCollisionSettings& a_settings) = 0;
+                                  cVector3d& a_segmentPointA,
+                                  cVector3d& a_segmentPointB,
+                                  cCollisionRecorder& a_recorder,
+                                  cCollisionSettings& a_settings) = 0;
 
     virtual void render(cRenderOptions& a_options) = 0;
     virtual void render(cRenderOptions& a_options, int a_currentDepth, int a_targetDepth) = 0;

@@ -4,6 +4,7 @@
 
 namespace chai3d {
 
+// Return the arithmetic mean; an empty point set maps to the origin.
 cVector3d computeCentroid(const std::vector<cVector3d>& a_points)
 {
     cVector3d centroid(0.0, 0.0, 0.0);
@@ -60,6 +61,7 @@ void computeEigenSystem(double a_cov[3][3],
                         double a_eigenvalues[3], 
                         cVector3d a_eigenvectors[3])
 {
+    // Jacobi rotations diagonalize the symmetric 3x3 covariance matrix.
     double A[3][3];
     double V[3][3];
 
@@ -186,6 +188,7 @@ void buildOBBFromPoints(const std::vector<cVector3d>& a_points, cCollisionOBBBox
 {
     if (a_points.empty()) return;
 
+    // Principal directions provide the box frame; projections provide its size.
     cVector3d centroid = computeCentroid(a_points);
 
     double cov[3][3];

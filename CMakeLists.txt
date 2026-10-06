@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 project(obb_chai3d LANGUAGES CXX)
 
+# Keep the library portable and require modern language features used by the tree.
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -26,6 +27,7 @@ file(GLOB OBB_SOURCES CONFIGURE_DEPENDS
 
 add_library(obb STATIC ${OBB_SOURCES})
 
+# Chai3D and its graphics/system dependencies are exposed to the test target.
 target_include_directories(obb
     PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}/include"
@@ -36,7 +38,7 @@ target_include_directories(obb
         ${LIBUSB_INCLUDE_DIRS}
 )
 
-# Đổi PRIVATE thành PUBLIC để obb_tests cũng nhận được 2 macro này
+
 target_compile_definitions(obb PUBLIC LINUX GLEW_STATIC)
 
 add_executable(obb_tests
@@ -55,7 +57,7 @@ target_link_libraries(obb_tests
         obb
         "${CHAI3D_LIBRARY}"
         OpenGL::GL
-        OpenGL::GLU     # <-- BẮT BUỘC: Thêm GLU để sửa triệt để lỗi linker glu*
+        OpenGL::GLU   
         ${LIBUSB_LIBRARIES}
         Threads::Threads
         dl

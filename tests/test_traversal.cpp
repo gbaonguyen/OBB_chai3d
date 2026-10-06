@@ -10,6 +10,7 @@ using namespace chai3d;
 
 void runTraversalTests()
 {
+    // Cover the broad-phase box, narrow-phase triangle, and full tree layers.
     std::cout << "\n--- BAT DAU KIEM TRA GIAI DOAN 4 (COLLISION TRAVERSAL) ---\n";
 
     // 1. Coarse Test: Segment vs OBBBox

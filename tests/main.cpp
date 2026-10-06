@@ -9,6 +9,9 @@
 #include "CCollisionOBBLeaf.h"
 #include "CCollisionOBB.h"
 
+// Test entry points are kept separate so each algorithm can report its own
+// assertions while the benchmark remains opt-in.
+
 void runMathTests();
 void runTraversalTests();
 void runTreeTests();

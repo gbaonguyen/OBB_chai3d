@@ -8,6 +8,7 @@ using namespace chai3d;
 
 void runMathTests()
 {
+    // Rotated box corners exercise PCA directions and Jacobi eigenvectors.
     std::cout << "\n--- BAT DAU KIEM TRA GIAI DOAN 2 (PCA & JACOBI) ---\n";
 
     double cos45 = std::cos(M_PI / 4.0);

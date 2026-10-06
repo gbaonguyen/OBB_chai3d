@@ -7,6 +7,7 @@
 
 namespace chai3d {
 
+// PCA/Jacobi helpers used to construct a tight oriented bounding box.
 cVector3d computeCentroid(const std::vector<cVector3d>& a_points);
 
 void computeCovarianceMatrix(const std::vector<cVector3d>& a_points, 

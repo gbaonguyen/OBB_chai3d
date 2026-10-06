@@ -9,6 +9,7 @@ using namespace chai3d;
 
 void runBenchmark()
 {
+    // Use increasingly dense spheres to compare build and coherent-query cost.
     std::cout << "\n===============================================================\n";
     std::cout << "                 CHAI3D COLLISION BENCHMARK                    \n";
     std::cout << "           So sanh: AABB Tree vs OBB Tree vs OBB Local Search  \n";

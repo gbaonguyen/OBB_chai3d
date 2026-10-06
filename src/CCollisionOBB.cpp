@@ -8,6 +8,7 @@
 
 namespace chai3d {
 
+// The detector starts empty and can be populated with initialize().
 cCollisionOBB::cCollisionOBB()
 {
     m_root = nullptr;
@@ -36,7 +37,7 @@ void cCollisionOBB::initialize(const double a_radius)
 
 void cCollisionOBB::buildNeighbors()
 {
-    // Tạo khóa xác định một cạnh nối giữa 2 đỉnh trong không gian
+    // Quantized, order-independent edge keys make shared-edge lookup stable.
     auto edgeKey = [](const cVector3d& p1, const cVector3d& p2) {
         cVector3d a = p1;
         cVector3d b = p2;
@@ -105,7 +106,7 @@ void cCollisionOBB::initialize(const std::vector<cTriangle*>& a_triangles)
     std::vector<cTriangle*> triList = m_triangles;
     m_root = buildTree(triList, 0);
 
-    // Xây dựng danh sách tam giác láng giềng cho Local Search
+    // Build neighbor relationships for local search optimization.
     buildNeighbors();
 }
 
@@ -122,6 +123,7 @@ cCollisionOBBNode* cCollisionOBB::buildTree(std::vector<cTriangle*>& a_triangles
         points.push_back(tri->m_v2);
     }
 
+    // Fit one box around this subset before choosing its split direction.
     cCollisionOBBBox nodeBox;
     buildOBBFromPoints(points, nodeBox);
 
@@ -163,6 +165,7 @@ cCollisionOBBNode* cCollisionOBB::buildTree(std::vector<cTriangle*>& a_triangles
             rightList.push_back(tri);
     }
 
+    // A degenerate centroid split is replaced with a balanced partition.
     if (leftList.empty() || rightList.empty())
     {
         leftList.clear();
@@ -218,7 +221,9 @@ bool cCollisionOBB::computeCollision(cGenericObject* a_object,
 {
     if (m_root == nullptr) return false;
 
-    // 1. LOCAL SEARCH: Ưu tiên kiểm tra tam giác va chạm trước đó và các láng giềng
+    // Coherent queries often hit nearby triangles, so try the previous hit
+    // and its mesh neighbors before traversing the hierarchy.
+    // 1.Local search: check the last collided triangle and its neighbors.
     if (m_useNeighbors && m_lastCollidedTriangle != nullptr)
     {
         cVector3d hitPoint, hitNormal;
@@ -258,7 +263,7 @@ bool cCollisionOBB::computeCollision(cGenericObject* a_object,
         }
     }
 
-    // 2. FALLBACK: Duyệt DFS toàn bộ cây OBB nếu Local Search trượt
+    // Fall back to a full DFS when the local neighborhood misses.
     bool hit = m_root->computeCollision(a_object, a_segmentPointA, a_segmentPointB, a_recorder, a_settings);
 
     if (hit && !a_recorder.m_collisions.empty())
